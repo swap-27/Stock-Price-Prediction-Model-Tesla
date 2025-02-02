@@ -3,4 +3,9 @@ numpy
 seaborn
 matplotlib
 scikit-learn
+yfinance
+keras
+tensorflow
+dataclasses
+
 -e .

@@ -20,7 +20,7 @@ def get_requirements(file_path:str)->List[str]:
 
 setup(
 
-    name='Stick Price Prediction Model',
+    name='Stock Price Prediction Model',
     version='0.0.1',
     author='Swapnil',
     author_email='swapnilanand1998@gmail.com',
