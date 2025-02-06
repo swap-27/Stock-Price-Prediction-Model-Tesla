@@ -7,5 +7,5 @@ yfinance
 keras
 tensorflow
 dataclasses
-
+dill
 -e .
