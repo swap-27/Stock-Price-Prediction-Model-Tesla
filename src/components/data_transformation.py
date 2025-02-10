@@ -69,7 +69,7 @@ class DataTransformation:
             # Save MinMaxScaler for future use
             save_object(self.data_transformation_config.preprocessor_obj_file_path, scaler)
 
-            return x_train, y_train, x_test, y_test, self.data_transformation_config.preprocessor_obj_file_path
+            return x_train, x_test, y_train, y_test, self.data_transformation_config.preprocessor_obj_file_path
 
         except Exception as e:
             raise CustomException(e, sys)

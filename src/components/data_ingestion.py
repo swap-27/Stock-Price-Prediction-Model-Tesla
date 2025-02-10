@@ -1,10 +1,13 @@
 import os
 import sys
+from src.components.fetch_stock_data import StockPriceDataFetch
 from src.exception import CustomException
 from src.logger import logging
 from src.components.data_transformation import DataTransformation
+from src.components.model_trainer import ModelTrainer
 import datetime
 from dataclasses import dataclass 
+import traceback
 
 import pandas as pd
 import math
@@ -28,20 +31,16 @@ class DataIngestion:
         logging.info("Entered the Data Ingestion Method")
 
         try:
-            end_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d')
-            end_date_main = datetime.datetime.strptime(end_date, '%Y-%m-%d') - datetime.timedelta(days = 1)
-
-            df = yf.download('TSLA', start='2010-06-29', end=end_date_main)
-            df.columns = df.columns.droplevel(1)
-            logging.info("Read the dataset as dataframe")
-
-            os.makedirs(os.path.dirname(self.ingestion_config.train_data_path), exist_ok=True)
-            close_df = df['Close']
-            close_df.to_csv(self.ingestion_config.raw_data_path, index = True)
+            
+            stock_price_data_fetch = StockPriceDataFetch()
+            close_df = stock_price_data_fetch.close_df
 
             logging.info("Train Test split initiated")
             train_data, test_data = train_test_split(close_df, test_size=0.2, shuffle=False)
 
+            os.makedirs(os.path.dirname(self.ingestion_config.raw_data_path), exist_ok=True)
+            
+            close_df.to_csv(self.ingestion_config.raw_data_path, index = True)
             train_data.to_csv(self.ingestion_config.train_data_path, index = True)
             test_data.to_csv(self.ingestion_config.test_data_path, index = True)
 
@@ -52,11 +51,21 @@ class DataIngestion:
                 self.ingestion_config.test_data_path
             )
         except Exception as e:
+            print("Full error traceback:")
+            print(traceback.format_exc())  # Prints full error details
+    
             raise CustomException(e, sys)
         
 if __name__ == "__main__":
-    obj = DataIngestion()
-    train_data, test_data = obj.initiate_data_ingestion()
-    print(train_data, test_data)
+    data_ingestion = DataIngestion()
+    train_data, test_data = data_ingestion.initiate_data_ingestion()
+    
     data_transformation = DataTransformation()
-    data_transformation.initiate_data_transformation(train_data, test_data)
+
+    X_train, X_test, y_train, y_test, preprocessor_path = data_transformation.initiate_data_transformation(train_data, test_data)
+
+    model_trainer = ModelTrainer()
+
+    model_trainer.initiate_model_trainer(X_train=X_train, X_test=X_test, y_train=y_train, y_test=y_test)
+    
+    
