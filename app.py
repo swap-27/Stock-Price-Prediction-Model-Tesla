@@ -7,6 +7,8 @@ import numpy as np
 from src.pipeline.predict_pipeline import PredictPipeline
 from src.logger import logging
 
+import traceback
+
 application = Flask(__name__)
 app = application
 
@@ -34,7 +36,14 @@ def predict_datapoint():
         logging.info('Prediction values generated.')
 
         return render_template('home.html', predictions = predictions, dates = dates)
-    
+
+@app.errorhandler(500)
+def internal_error(error):
+    print("🔥 ERROR TRACEBACK 🔥")
+    print(traceback.format_exc())  # Prints full error log in Render logs
+    return "Internal Server Error", 500
+  
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port = port, debug=True)
