@@ -41,6 +41,7 @@ class DataIngestion:
             os.makedirs(os.path.dirname(self.ingestion_config.raw_data_path), exist_ok=True)
             
             close_df.to_csv(self.ingestion_config.raw_data_path, index = True)
+
             train_data.to_csv(self.ingestion_config.train_data_path, index = True)
             test_data.to_csv(self.ingestion_config.test_data_path, index = True)
 

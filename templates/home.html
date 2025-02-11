@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tesla Stock Price Prediction</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Predict Tesla Share Price for:</h1>
+        <form action="{{ url_for('predict_datapoint') }}" method="post">
+            <div class="mb-3">
+                <input type="radio" id="one_day" name="prediction_duration" value="1" required>
+                <label for="one_day">For next 1 day</label>
+            </div>
+            <div class="mb-3">
+                <input type="radio" id="one_week" name="prediction_duration" value="7">
+                <label for="one_week">For next 1 week</label>
+            </div>
+            <div class="mb-3">
+                <input type="radio" id="fifteen_days" name="prediction_duration" value="15">
+                <label for="fifteen_days">For next 15 days</label>
+            </div>
+            <div class="mb-3">
+                <input class="btn btn-primary" type="submit" value="Predict">
+            </div>
+        </form>
+
+        {% if predictions %}
+        <h2>Predicted Prices:</h2>
+        <ul>
+            {% for price in predictions %}
+                <li>{{ price }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Stock Price Graph</h2>
+        <canvas id="stockChart"></canvas>
+
+        <script>
+            var ctx = document.getElementById('stockChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: JSON.parse('{{ dates | tojson | safe }}'),
+                    datasets: [{
+                        label: 'Historical & Predicted Prices',
+                        data: JSON.parse('{{ predictions | tojson | safe }}'),
+                        borderColor: 'blue',
+                        fill: false
+                    }]
+            }
+        });
+        </script>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -9,4 +9,5 @@ tensorflow
 dataclasses
 dill
 h5py
+Flask
 -e .
