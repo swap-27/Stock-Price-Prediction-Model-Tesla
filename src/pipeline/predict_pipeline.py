@@ -1,3 +1,6 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 import sys
 import pandas as pd
 from src.exception import CustomException

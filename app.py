@@ -1,11 +1,11 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 from flask import Flask, request, render_template
 import pandas as pd
 import numpy as np
 from src.pipeline.predict_pipeline import PredictPipeline
 from src.logger import logging
-import os
-
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 application = Flask(__name__)
 app = application

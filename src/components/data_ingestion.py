@@ -1,4 +1,7 @@
 import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
+import os
 import sys
 from src.components.fetch_stock_data import StockPriceDataFetch
 from src.exception import CustomException

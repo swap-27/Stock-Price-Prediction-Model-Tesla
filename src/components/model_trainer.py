@@ -1,3 +1,6 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 from dataclasses import dataclass
 import os
 from src.logger import logging
