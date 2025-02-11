@@ -19,7 +19,9 @@ def predict_datapoint():
     else:
         pred_range = request.form.get('prediction_duration')
 
-        predict_pipeline = PredictPipeline(pred_range)
+        train_model = request.form.get('train_model')
+
+        predict_pipeline = PredictPipeline(pred_range, train_model)
 
         dates, predictions = predict_pipeline.predict()
 

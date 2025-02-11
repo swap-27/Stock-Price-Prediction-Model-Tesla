@@ -10,4 +10,5 @@ dataclasses
 dill
 h5py
 Flask
+gunicorn
 -e .

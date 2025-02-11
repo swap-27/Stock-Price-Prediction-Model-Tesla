@@ -9,8 +9,9 @@ from src.utils import load_object
 import numpy as np
 
 class PredictPipeline:
-    def __init__(self, pred_range:int):
+    def __init__(self, pred_range:int, train_model):
         self.pred_range = int(pred_range)
+        self.train_model = train_model
     def predict(self):
 
         try:
@@ -19,13 +20,13 @@ class PredictPipeline:
 
             chk_df = pd.read_csv('artifacts/data.csv')
             
-            end_date = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d')
-            end_date_main = datetime.datetime.strptime(end_date, '%Y-%m-%d')
+            end_date_main = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d')
+            
             
             last_date = chk_df['Date'].iloc[[-1]].values[0]
 
 
-            if chk_df['Date'].iloc[[-1]].values[0] != end_date_main:
+            if self.train_model:
                 os.system("python src/components/data_ingestion.py")
 
             model = keras.models.load_model(model_path)
