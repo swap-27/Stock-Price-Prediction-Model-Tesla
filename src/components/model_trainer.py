@@ -45,7 +45,7 @@ class ModelTrainer:
             model.fit(X_train, y_train, epochs=50, batch_size=32, validation_data=(X_test, y_test), callbacks=[early_stopping])
 
 
-            model.save("artifacts/model.keras")
+            model.save("artifacts/model.keras", save_format="keras")
             # Evaluate the model on the test set
             test_loss = model.evaluate(X_test, y_test)
             print(f"Test Loss: {test_loss}")
