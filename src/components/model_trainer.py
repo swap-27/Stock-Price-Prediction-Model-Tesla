@@ -6,13 +6,13 @@ from keras.layers import LSTM, Dropout, Dense
 import sys
 from keras.callbacks import EarlyStopping
 from src.exception import CustomException
-from src.utils import save_object, save_model
+from src.utils import save_object
 import joblib
 
 
 @dataclass
 class ModelTrainerConfig:
-    trained_model_file_path = os.path.join("artifacts", "model.joblib")
+    trained_model_file_path = os.path.join("artifacts", "model.pkl")
 
 class ModelTrainer:
     def __init__(self):
@@ -42,7 +42,7 @@ class ModelTrainer:
             model.fit(X_train, y_train, epochs=50, batch_size=32, validation_data=(X_test, y_test), callbacks=[early_stopping])
 
 
-            model.save("artifacts/model", save_format="tf")
+            model.save("artifacts/model.keras")
             # Evaluate the model on the test set
             test_loss = model.evaluate(X_test, y_test)
             print(f"Test Loss: {test_loss}")

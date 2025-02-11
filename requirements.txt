@@ -8,4 +8,5 @@ keras
 tensorflow
 dataclasses
 dill
+h5py
 -e .
