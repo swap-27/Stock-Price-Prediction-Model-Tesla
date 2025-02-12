@@ -1,6 +1,3 @@
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
 import sys
 import pandas as pd
 from src.exception import CustomException
@@ -10,6 +7,8 @@ from src.components import data_ingestion
 import os
 from src.utils import load_object
 import numpy as np
+import tensorflow as tf
+from keras.models import load_model
 
 class PredictPipeline:
     def __init__(self, pred_range:int, train_model):
@@ -32,7 +31,10 @@ class PredictPipeline:
             if self.train_model:
                 os.system("python src/components/data_ingestion.py")
 
-            model = keras.models.load_model(model_path)
+            
+            with tf.device('/CPU:0'):
+                model = load_model(model_path)
+            
 
             scaler = load_object(preprocessor_path)
 
