@@ -12,7 +12,7 @@ import keras
 import traceback
 
 print(f"TensorFlow Version: {tf.__version__}, Keras Version: {keras.__version__}")
-
+print(f"Checking model file: {os.path.exists('artifacts/model.keras')}")
 application = Flask(__name__)
 app = application
 
