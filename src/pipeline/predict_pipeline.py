@@ -1,7 +1,6 @@
 import sys
 import pandas as pd
 from src.exception import CustomException
-import keras
 import datetime
 from src.components import data_ingestion
 import os
@@ -33,7 +32,7 @@ class PredictPipeline:
 
             
             with tf.device('/CPU:0'):
-                model = load_model(model_path)
+                model = load_model(model_path, compile=False)
             
 
             scaler = load_object(preprocessor_path)

@@ -9,6 +9,8 @@ from src.logger import logging
 
 import traceback
 
+print(f"TensorFlow Version: {tf.__version__}, Keras Version: {keras.__version__}")
+
 application = Flask(__name__)
 app = application
 

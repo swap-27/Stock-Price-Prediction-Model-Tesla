@@ -5,6 +5,7 @@ matplotlib
 scikit-learn
 yfinance
 tensorflow==2.13.0
+keras==2.13.1
 dill
 Flask
 gunicorn
