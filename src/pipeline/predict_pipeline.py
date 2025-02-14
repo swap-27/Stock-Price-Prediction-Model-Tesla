@@ -8,23 +8,42 @@ from src.utils import load_object
 import numpy as np
 import tensorflow as tf
 from keras.models import load_model
+from src.components.data_transformation import DataTransformation
+import matplotlib
+matplotlib.use('Agg')  # Use a non-GUI backend
+import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 class PredictPipeline:
     def __init__(self, pred_range:int, train_model):
         self.pred_range = int(pred_range)
         self.train_model = train_model
+
+        #delete from here
+        model_path = "artifacts/model.h5"
+        preprocessor_path = "artifacts/preprocessor.pkl"
+
+        with tf.device('/CPU:0'):
+            self.model = load_model(model_path)
+
+        self.scaler = load_object(preprocessor_path)
+        self.test_data = pd.read_csv('artifacts/test.csv')
+
+
+
     def predict(self):
 
         try:
-            model_path = "artifacts/model.keras"
+            model_path = "artifacts/model.h5"
             preprocessor_path = "artifacts/preprocessor.pkl"
+            graph_output_path="stock_predictions.jpg"
 
             chk_df = pd.read_csv('artifacts/data.csv')
             
             end_date_main = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d')
             
             
-            last_date = chk_df['Date'].iloc[[-1]].values[0]
+            last_date = chk_df.iloc[-1]['Date']
 
 
             if self.train_model:
@@ -32,16 +51,46 @@ class PredictPipeline:
 
             
             with tf.device('/CPU:0'):
-                model = load_model(model_path, compile=False)
-            
+                model = load_model(model_path)
+                print("Model loaded successfully!")
 
             scaler = load_object(preprocessor_path)
 
             test_data = pd.read_csv('artifacts/test.csv')
+
+            test_data['Date'] = test_data['Date'].apply(lambda x: datetime.datetime.strptime(x, '%Y-%m-%d'))
+            test_data.set_index('Date', inplace=True)
             test_data_scaled = scaler.transform(test_data['Close'].values.reshape(-1,1))
 
             time_steps = 60
 
+            datatrans = DataTransformation()
+            x_test, y_test = datatrans.create_sequences(test_data_scaled, time_steps)
+            x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], 1)
+            hist_pred = model.predict(x_test)
+            hist_pred = scaler.inverse_transform(hist_pred)
+            y_test_actual = scaler.inverse_transform(y_test.reshape(-1, 1))
+
+            plt.figure(figsize=(10, 6))
+
+            # Plot actual vs predicted prices for the test set
+            plt.plot(test_data.index[time_steps:], y_test_actual, color='blue', label='Actual Stock Price')
+            plt.plot(test_data.index[time_steps:], hist_pred, color='red', label='Predicted Stock Price')
+
+            # Labeling the graph
+            plt.title('Stock Price Prediction Comparison - Predicted vs. Actual')
+            
+            plt.ylabel('Tesla - Stock Price')
+            plt.legend()
+
+            # Display the plot with proper date formatting
+            plt.xticks(rotation=30)
+            static_dir = os.path.join(os.getcwd(), 'static')
+            if not os.path.exists(static_dir):
+                os.makedirs(static_dir)
+            image_path = os.path.join(static_dir, 'stock_predictions.jpg')
+            plt.savefig(image_path, format='jpeg', dpi=300)
+            plt.close()
             # Get the last `time_steps` days from the test set
             last_sequence = test_data_scaled[-time_steps:]
 
@@ -75,7 +124,27 @@ class PredictPipeline:
 
             predictions = [round(i, 2) for i in predictions]
 
-            return pred_dates, predictions
+            pred_df = pd.DataFrame(zip(pred_dates, predictions), columns=['Date','Predicted Price'])
+            print(pred_df)
+
+            pred_df_img = pred_df.copy()
+
+            pred_df_img['Date'] = pred_df_img['Date'].apply(lambda x: datetime.datetime.strptime(x, '%Y-%m-%d'))
+            pred_df_img.set_index('Date', inplace=True)
+            plt.figure(figsize=(10, 6))
+            plt.plot(pred_df_img, color='red', label='Predicted Stock Price')
+
+            # Labeling the graph
+            plt.title('Tesla - Predicted Stock Price ($) for Next '+str(self.pred_range)+' Days')
+            plt.xlabel('Date')
+            plt.ylabel('Stock Price')
+            plt.xticks(rotation=30)
+            plt.legend()
+            pred_image_path = os.path.join(static_dir, 'future_stock_predictions.jpg')
+            plt.savefig(pred_image_path, format='jpeg', dpi=300)
+            plt.close()
+            
+            return pred_df
 
         except Exception as e:
             raise CustomException(e, sys)

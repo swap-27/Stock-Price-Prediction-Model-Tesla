@@ -1,6 +1,3 @@
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
 from dataclasses import dataclass
 import os
 from src.logger import logging
@@ -15,7 +12,7 @@ import joblib
 
 @dataclass
 class ModelTrainerConfig:
-    trained_model_file_path = os.path.join("artifacts", "model.pkl")
+    trained_model_file_path = os.path.join("artifacts", "model.h5")
 
 class ModelTrainer:
     def __init__(self):
@@ -45,10 +42,12 @@ class ModelTrainer:
             model.fit(X_train, y_train, epochs=50, batch_size=32, validation_data=(X_test, y_test), callbacks=[early_stopping])
 
 
-            model.save("artifacts/model.keras", save_format="keras")
+            model.save("artifacts/model.h5")
+            
             # Evaluate the model on the test set
             test_loss = model.evaluate(X_test, y_test)
             print(f"Test Loss: {test_loss}")
-
+            print(model.summary())
+            
         except Exception as e:
             raise CustomException(e, sys)

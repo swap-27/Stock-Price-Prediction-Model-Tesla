@@ -1,6 +1,3 @@
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
 from src.exception import CustomException
 from src.logger import logging
 from src.utils import save_object
@@ -50,8 +47,8 @@ class DataTransformation:
 
             logging.info('Read Train and Test data successfully')
             
-            train_data = train_data['Close']
-            test_data = test_data['Close']
+            train_data = train_data.set_index('Date', inplace=True)
+            test_data = test_data.set_index('Date', inplace=True)
 
             scaler = self.get_data_transformer_object()
             train_data_scaled = scaler.fit_transform(train_data.values.reshape(-1,1))
